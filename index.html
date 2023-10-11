@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJAX</title>
+</head>
+
+<body>
+    <div>Score: <span id="score"></span></div>
+    <div id="output"></div>
+    <div id="selAnswers"></div>
+    <button id="btn">Click me for More</button>
+
+    <script>
+        let btn = document.getElementById('btn');
+        btn.addEventListener('click', nextItem);
+        let answers = { 'correct': 0, 'wrong': 0 };
+        let output = document.getElementById('output');
+
+        function sendAnswers(event)
+        {
+            console.log(event.target.getAttribute('data-cor'));
+        }
+
+
+        function nextItem()
+        {
+            console.log('clicked');
+            const url = 'https://opentdb.com/api.php?amount=1';
+            let html = '<h2>Question</h2>';
+            requestAJAX(url, (json) =>
+            {
+                let obj = json.results[0];
+                html += `<div>
+                    <div class="cat">${obj.category}</div>
+                    <div class="que">${obj.question}</div>
+                    </div >`;
+                output.innerHTML = html;
+                answerBuilder(obj.correct_answer, obj.incorrect_answers);
+            });
+        }
+
+        function answerBuilder(correct, incorrect)
+        {
+            let holder = incorrect;
+            holder.push(correct);
+            holder.sort();
+            let ans = document.getElementById('selAnswers');
+            ans.innerHTML = '';
+            holder.forEach(a =>
+            {
+                let el = document.createElement('div');
+                let checker = a == correct ? true : false;
+                el.setAttribute('data-cor', checker);
+                el.innerHTML = a;
+                el.addEventListener('click', sendAnswers);
+                console.log(el);
+                ans.appendChild(el);
+            });
+
+
+            console.log(holder);
+
+        }
+
+
+        function requestAJAX(url, callback)
+        {
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = () =>
+            {
+                if (xhr.readyState == 4 && xhr.status == 200)
+                {
+                    let json = JSON.parse(xhr.responseText);
+                    callback(json);
+                }
+            }
+
+            xhr.open('GET', url, true);
+            xhr.send();
+        }
+    </script>
+</body>
+
+</html>
