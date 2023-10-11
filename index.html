@@ -5,10 +5,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AJAX</title>
+    <style>
+        #selAnswers div {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 5px;
+            display: inline-block;
+        }
+
+        .cat {
+            font-size: 0.7em;
+        }
+
+        .que {
+            font-size: 1.5em;
+        }
+    </style>
 </head>
 
 <body>
-    <div>Score: <span id="score"></span></div>
+    <div><span id="score"></span></div>
     <div id="output"></div>
     <div id="selAnswers"></div>
     <button id="btn">Click me for More</button>
@@ -21,7 +37,29 @@
 
         function sendAnswers(event)
         {
-            console.log(event.target.getAttribute('data-cor'));
+            let res = event.target.getAttribute('data-cor');
+            let attr = (res == "true") ? 'correct' : 'wrong';
+            answers[attr] = answers[attr] + 1;
+
+            document.getElementById('score').innerHTML = `Correct: ${answers['correct']}, Wrong: ${answers['wrong']}`;
+
+            let ans = document.getElementById('selAnswers');
+            let correctAns = correctAnswerIs();
+            ans.innerHTML = `${attr} The correct answer is  ${correctAns}`;
+        }
+
+        function correctAnswerIs()
+        {
+            let els = document.querySelectorAll("#selAnswers div");
+            let answer = '';
+            els.forEach(x =>
+            {
+                console.log(x.getAttribute('data-cor'));
+                if (x.getAttribute('data-cor') == 'true') answer = x.innerText;
+            })
+            return answer;
+            console.log('Not found');
+
         }
 
 
@@ -36,7 +74,7 @@
                 html += `<div>
                     <div class="cat">${obj.category}</div>
                     <div class="que">${obj.question}</div>
-                    </div >`;
+                    </div>`;
                 output.innerHTML = html;
                 answerBuilder(obj.correct_answer, obj.incorrect_answers);
             });
